@@ -154,4 +154,108 @@ public enum MarkdownDocument {
             s[run.range].inlinePresentationIntent = merged
         }
     }
+
+    // MARK: - Save: AttributedString -> Markdown
+
+    public static func markdown(from attributed: AttributedString) -> String {
+        var blocks: [(intent: PresentationIntent?, range: Range<AttributedString.Index>, checked: Bool?)] = []
+        for run in attributed.runs {
+            let intent = run.presentationIntent
+            let checked = run[TaskItemAttribute.self]
+            // Skip the structural block-separator newline runs the load path inserts
+            // between blocks (no intent, content is only newlines): block separation
+            // is reinstated by `joined(separator: "\n")` below.
+            if intent == nil {
+                let text = String(attributed[run.range].characters)
+                if !text.isEmpty, text.allSatisfy({ $0 == "\n" }) { continue }
+            }
+            if let last = blocks.last, last.intent == intent {
+                blocks[blocks.count - 1].range = last.range.lowerBound..<run.range.upperBound
+                if blocks[blocks.count - 1].checked == nil { blocks[blocks.count - 1].checked = checked }
+            } else {
+                blocks.append((intent, run.range, checked))
+            }
+        }
+
+        let lines = blocks.map { renderBlock(intent: $0.intent, range: $0.range, checked: $0.checked, in: attributed) }
+        var text = lines.joined(separator: "\n")
+        if !text.hasSuffix("\n") { text += "\n" }
+        return text
+    }
+
+    private static func renderBlock(
+        intent: PresentationIntent?,
+        range: Range<AttributedString.Index>,
+        checked: Bool?,
+        in attributed: AttributedString
+    ) -> String {
+        let kinds = intent?.components.map(\.kind) ?? [.paragraph]
+
+        if let lang = codeBlockLanguage(in: kinds) {
+            let raw = String(attributed[range].characters)
+            return "```\(lang ?? "")\n\(raw)\n```"
+        }
+
+        let inline = inlineMarkdown(for: range, in: attributed)
+
+        if let level = headerLevel(in: kinds) {
+            return String(repeating: "#", count: level) + " " + inline
+        }
+        if let ordinal = orderedOrdinal(in: kinds) {
+            return "\(ordinal). \(inline)"
+        }
+        if isUnordered(kinds) {
+            if let checked { return "- [\(checked ? "x" : " ")] \(inline)" }
+            return "- \(inline)"
+        }
+        return inline
+    }
+
+    private static func headerLevel(in kinds: [PresentationIntent.Kind]) -> Int? {
+        for k in kinds { if case .header(let l) = k { return l } }
+        return nil
+    }
+    private static func orderedOrdinal(in kinds: [PresentationIntent.Kind]) -> Int? {
+        var inOrdered = false, ordinal = 1
+        for k in kinds {
+            if case .orderedList = k { inOrdered = true }
+            if case .listItem(let o) = k { ordinal = o }
+        }
+        return inOrdered ? ordinal : nil
+    }
+    private static func isUnordered(_ kinds: [PresentationIntent.Kind]) -> Bool {
+        kinds.contains { if case .unorderedList = $0 { return true } else { return false } }
+    }
+    private static func codeBlockLanguage(in kinds: [PresentationIntent.Kind]) -> String?? {
+        for k in kinds { if case .codeBlock(let hint) = k { return .some(hint) } }
+        return .none
+    }
+
+    private static func inlineMarkdown(for range: Range<AttributedString.Index>, in attributed: AttributedString) -> String {
+        var out = ""
+        for run in attributed[range].runs {
+            let text = String(attributed[run.range].characters)
+            let intent = run.inlinePresentationIntent ?? []
+            var piece: String
+            if intent.contains(.code) {
+                piece = "`\(text)`"
+            } else {
+                piece = escapeInline(text)
+                if intent.contains(.stronglyEmphasized) { piece = "**\(piece)**" }
+                if intent.contains(.emphasized) { piece = "*\(piece)*" }
+            }
+            if let url = run.link { piece = "[\(piece)](\(url.absoluteString))" }
+            out += piece
+        }
+        return out
+    }
+
+    private static func escapeInline(_ text: String) -> String {
+        var result = ""
+        for ch in text {
+            if "\\`*_[]".contains(ch) { result.append("\\") }
+            result.append(ch)
+        }
+        return result
+    }
 }
