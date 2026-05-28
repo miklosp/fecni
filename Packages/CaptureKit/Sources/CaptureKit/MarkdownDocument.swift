@@ -75,11 +75,14 @@ public enum MarkdownDocument {
     ) {
         var ordinal = 1
         var first = true
+        // One list intent per list so all items share the same list identity;
+        // the save path uses that shared identity to keep items of the same list
+        // joined by a single newline (vs. a blank line between distinct blocks).
+        let listIntent = PresentationIntent(listKind, identity: nextIdentity(), parent: listContext)
         for item in items {
             if !first { builder.append(AttributedString("\n")) }
             first = false
             // Build the parent chain: list -> listItem, with any outer list as ancestor.
-            let listIntent = PresentationIntent(listKind, identity: nextIdentity(), parent: listContext)
             let itemIntent = PresentationIntent(.listItem(ordinal: ordinal),
                                                 identity: nextIdentity(), parent: listIntent)
             let checked: Bool? = item.checkbox.map { $0 == .checked }
@@ -119,6 +122,10 @@ public enum MarkdownDocument {
         switch markup {
         case let text as Text:
             return AttributedString(text.string)
+        case is SoftBreak:
+            return AttributedString(" ")
+        case is LineBreak:
+            return AttributedString(" ")
         case let strong as Strong:
             var s = concatInline(strong.children)
             applyInline(.stronglyEmphasized, to: &s)
@@ -178,9 +185,36 @@ public enum MarkdownDocument {
         }
 
         let lines = blocks.map { renderBlock(intent: $0.intent, range: $0.range, checked: $0.checked, in: attributed) }
-        var text = lines.joined(separator: "\n")
+        let groupIDs = blocks.map { listGroupID(of: $0.intent) }
+
+        var text = ""
+        for i in lines.indices {
+            if i > 0 {
+                // Items of the same list join with a single newline; all other
+                // top-level blocks are separated by a blank line.
+                let sameList = groupIDs[i - 1] != nil && groupIDs[i - 1] == groupIDs[i]
+                text += sameList ? "\n" : "\n\n"
+            }
+            text += lines[i]
+        }
         if !text.hasSuffix("\n") { text += "\n" }
         return text
+    }
+
+    /// The identity of the `.unorderedList`/`.orderedList` component of a block's
+    /// intent, or `nil` if the block is not a list item. Items of the same list
+    /// share this identity (the loader chains each item's intent to one list intent).
+    private static func listGroupID(of intent: PresentationIntent?) -> Int? {
+        guard let intent else { return nil }
+        for component in intent.components {
+            switch component.kind {
+            case .unorderedList, .orderedList:
+                return component.identity
+            default:
+                continue
+            }
+        }
+        return nil
     }
 
     private static func renderBlock(
