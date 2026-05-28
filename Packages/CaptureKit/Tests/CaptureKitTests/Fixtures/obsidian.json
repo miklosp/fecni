@@ -1,1 +1,6 @@
-{ "vaults": {} }
+{
+  "vaults": {
+    "a1b2": { "path": "/Users/me/Notes", "ts": 1716800000000, "open": true },
+    "c3d4": { "path": "/Users/me/Archive", "ts": 1700000000000 }
+  }
+}
