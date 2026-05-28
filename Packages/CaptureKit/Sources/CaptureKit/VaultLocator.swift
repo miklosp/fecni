@@ -38,4 +38,27 @@ public enum VaultLocator {
         guard let data = try? Data(contentsOf: configURL) else { return [] }
         return (try? vaults(fromObsidianConfig: data)) ?? []
     }
+
+    /// Immediate child directories of a vault, excluding dot-folders, sorted by name.
+    public static func subfolders(ofVault vaultPath: String) -> [String] {
+        let fm = FileManager.default
+        let root = URL(fileURLWithPath: vaultPath, isDirectory: true)
+        guard let contents = try? fm.contentsOfDirectory(
+            at: root,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        ) else { return [] }
+        return contents
+            .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true }
+            .map { $0.lastPathComponent }
+            .filter { !$0.hasPrefix(".") }
+            .sorted()
+    }
+
+    /// A folder is an Obsidian vault if it contains a `.obsidian` directory.
+    public static func isVault(_ path: String) -> Bool {
+        var isDir: ObjCBool = false
+        let dot = URL(fileURLWithPath: path).appendingPathComponent(".obsidian").path
+        return FileManager.default.fileExists(atPath: dot, isDirectory: &isDir) && isDir.boolValue
+    }
 }
