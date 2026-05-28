@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		41A90F5CA740E516CC00B886 /* CaptureKit in Frameworks */ = {isa = PBXBuildFile; productRef = B5E55A5CCF0D519D7639A991 /* CaptureKit */; };
+		DFF1EEBD753AE3AB8D379FF4 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 6ED89F24179AF1C557344165 /* KeyboardShortcuts */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		644765A12FC8C5B70059BA77 /* fecni.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = fecni.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -13,6 +18,8 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		644765A32FC8C5B70059BA77 /* fecni */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = fecni;
 			sourceTree = "<group>";
 		};
@@ -23,6 +30,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41A90F5CA740E516CC00B886 /* CaptureKit in Frameworks */,
+				DFF1EEBD753AE3AB8D379FF4 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +74,8 @@
 			);
 			name = fecni;
 			packageProductDependencies = (
+				B5E55A5CCF0D519D7639A991 /* CaptureKit */,
+				6ED89F24179AF1C557344165 /* KeyboardShortcuts */,
 			);
 			productName = fecni;
 			productReference = 644765A12FC8C5B70059BA77 /* fecni.app */;
@@ -94,6 +105,10 @@
 			);
 			mainGroup = 644765982FC8C5B70059BA77;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C398A323F4F31201CB869680 /* XCLocalSwiftPackageReference "CaptureKit" */,
+				E300BF331B145F348E5B0802 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 644765A22FC8C5B70059BA77 /* Products */;
 			projectDirPath = "";
@@ -255,6 +270,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -269,7 +285,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -285,6 +301,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -299,7 +316,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -325,6 +342,36 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		C398A323F4F31201CB869680 /* XCLocalSwiftPackageReference "CaptureKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/CaptureKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E300BF331B145F348E5B0802 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6ED89F24179AF1C557344165 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E300BF331B145F348E5B0802 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+		B5E55A5CCF0D519D7639A991 /* CaptureKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CaptureKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 644765992FC8C5B70059BA77 /* Project object */;
 }
