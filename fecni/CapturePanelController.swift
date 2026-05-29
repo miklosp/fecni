@@ -19,6 +19,7 @@ final class CapturePanelController: NSObject, NSWindowDelegate {
         if let panel {
             NSApp.activate(ignoringOtherApps: true)
             panel.makeKeyAndOrderFront(nil)
+            panel.orderFrontRegardless()
             return
         }
 
@@ -35,6 +36,7 @@ final class CapturePanelController: NSObject, NSWindowDelegate {
 
         NSApp.activate(ignoringOtherApps: true)
         panel.makeKeyAndOrderFront(nil)
+        panel.orderFrontRegardless()
     }
 
     /// Click-away: losing key focus saves & closes.
