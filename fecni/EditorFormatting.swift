@@ -33,9 +33,10 @@ struct EditorCommands: ViewModifier {
     }
 }
 
-/// Mutates the editor's `AttributedString` to apply the supported formats.
-/// Inline formats toggle over the selection; block formats apply to the
-/// paragraph(s) the selection/cursor sits in.
+/// Thin glue: turns the editor's `AttributedTextSelection` into the ranges /
+/// coverage that `CaptureKit.NoteFormatter` operates on, builds the block
+/// `PresentationIntent`s, and applies them. All mutation logic lives in
+/// `NoteFormatter` (unit-tested via `swift test`).
 enum Formatter {
     private static var identityCounter = 1000
     private static func nextIdentity() -> Int { identityCounter += 1; return identityCounter }
@@ -43,59 +44,44 @@ enum Formatter {
     // MARK: Inline
 
     static func toggleInline(_ intent: InlinePresentationIntent, in model: CaptureModel) {
-        let ranges = selectedRanges(in: model)
-        guard !ranges.isEmpty else { return }
-        for range in ranges {
-            let current = model.text[range].inlinePresentationIntent ?? []
-            let updated = current.contains(intent) ? current.subtracting(intent) : current.union(intent)
-            model.text[range].inlinePresentationIntent = updated.isEmpty ? nil : updated
-        }
+        NoteFormatter.toggleInline(intent, over: selectionRanges(in: model), in: &model.text)
     }
 
     // MARK: Block
 
     static func setHeading(_ level: Int, in model: CaptureModel) {
-        applyBlockIntent(in: model) {
+        applyBlock(in: model) {
             PresentationIntent(.header(level: level), identity: nextIdentity(), parent: nil)
         }
-        clearTaskItem(in: model)
     }
 
     static func toggleCodeBlock(in model: CaptureModel) {
-        applyBlockIntent(in: model) {
+        applyBlock(in: model) {
             PresentationIntent(.codeBlock(languageHint: nil), identity: nextIdentity(), parent: nil)
         }
-        clearTaskItem(in: model)
     }
 
     static func toggleList(_ kind: PresentationIntent.Kind, in model: CaptureModel) {
-        applyBlockIntent(in: model) {
+        applyBlock(in: model) {
             let list = PresentationIntent(kind, identity: nextIdentity(), parent: nil)
             return PresentationIntent(.listItem(ordinal: 1), identity: nextIdentity(), parent: list)
         }
-        clearTaskItem(in: model)
     }
 
     static func toggleTaskList(in model: CaptureModel) {
-        applyBlockIntent(in: model) {
+        applyBlock(in: model, taskChecked: false) {
             let list = PresentationIntent(.unorderedList, identity: nextIdentity(), parent: nil)
             return PresentationIntent(.listItem(ordinal: 1), identity: nextIdentity(), parent: list)
         }
-        for range in paragraphRanges(in: model) {
-            model.text[range][TaskItemAttribute.self] = false
-        }
     }
 
-    private static func applyBlockIntent(in model: CaptureModel, _ make: () -> PresentationIntent) {
-        for range in paragraphRanges(in: model) {
-            model.text[range].presentationIntent = make()
-        }
-    }
-
-    private static func clearTaskItem(in model: CaptureModel) {
-        for range in paragraphRanges(in: model) {
-            model.text[range][TaskItemAttribute.self] = nil
-        }
+    private static func applyBlock(
+        in model: CaptureModel,
+        taskChecked: Bool? = nil,
+        _ make: () -> PresentationIntent
+    ) {
+        guard let coverage = coverage(in: model) else { return }
+        NoteFormatter.applyBlock(make(), taskChecked: taskChecked, toParagraphsCovering: coverage, in: &model.text)
     }
 
     // MARK: Paste link
@@ -107,15 +93,15 @@ enum Formatter {
         guard let raw = NSPasteboard.general.string(forType: .string)?
             .trimmingCharacters(in: .whitespacesAndNewlines),
               let url = URL(string: raw), url.scheme != nil else { return false }
-        let ranges = selectedRanges(in: model)
+        let ranges = selectionRanges(in: model)
         guard let first = ranges.first, !first.isEmpty else { return false }
         for range in ranges { model.text[range].link = url }
         return true
     }
 
-    // MARK: Selection helpers
+    // MARK: Selection → ranges glue
 
-    private static func selectedRanges(in model: CaptureModel) -> [Range<AttributedString.Index>] {
+    private static func selectionRanges(in model: CaptureModel) -> [Range<AttributedString.Index>] {
         switch model.selection.indices(in: model.text) {
         case .insertionPoint: return []
         case .ranges(let set): return Array(set.ranges)
@@ -123,31 +109,13 @@ enum Formatter {
         }
     }
 
-    /// The full paragraph range(s) the selection or cursor sits in, expanded to
-    /// the nearest newline boundaries.
-    private static func paragraphRanges(in model: CaptureModel) -> [Range<AttributedString.Index>] {
-        let text = model.text
-        let chars = text.characters
-        let lo: AttributedString.Index
-        let hi: AttributedString.Index
-        switch model.selection.indices(in: text) {
-        case .insertionPoint(let i): lo = i; hi = i
+    private static func coverage(in model: CaptureModel) -> Range<AttributedString.Index>? {
+        switch model.selection.indices(in: model.text) {
+        case .insertionPoint(let i): return i..<i
         case .ranges(let set):
-            guard let first = set.ranges.first, let last = set.ranges.last else { return [] }
-            lo = first.lowerBound; hi = last.upperBound
-        @unknown default: return []
+            guard let first = set.ranges.first, let last = set.ranges.last else { return nil }
+            return first.lowerBound..<last.upperBound
+        @unknown default: return nil
         }
-
-        var start = lo
-        while start > chars.startIndex {
-            let prev = chars.index(before: start)
-            if chars[prev] == "\n" { break }
-            start = prev
-        }
-        var end = hi
-        while end < chars.endIndex, chars[end] != "\n" {
-            end = chars.index(after: end)
-        }
-        return [start..<end]
     }
 }
