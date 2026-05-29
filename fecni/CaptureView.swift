@@ -1,13 +1,13 @@
 import SwiftUI
-import CaptureKit
+import MarkdownEngine
 
-/// Holds the in-progress note as an `AttributedString` and bridges dismissal to
-/// a Markdown string for the coordinator to persist.
+/// Holds the in-progress note as Markdown text. With MarkdownEngine the editor's
+/// document *is* Markdown, so there is no AttributedString↔Markdown conversion —
+/// the string is what gets saved.
 @MainActor
 @Observable
 final class CaptureModel {
-    var text = AttributedString()
-    var selection = AttributedTextSelection()
+    var text: String = ""
     var showFooter = false
 
     private let draftStore: DraftStore
@@ -19,11 +19,11 @@ final class CaptureModel {
     }
 
     func textChanged() {
-        draftStore.scheduleSave(MarkdownDocument.markdown(from: text))
+        draftStore.scheduleSave(text)
     }
 
     func requestDismiss() {
-        onDismiss(MarkdownDocument.markdown(from: text))
+        onDismiss(text)
     }
 }
 
@@ -32,11 +32,7 @@ struct CaptureView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            TextEditor(text: $model.text, selection: $model.selection)
-                .font(.body)
-                .lineSpacing(3)
-                .scrollContentBackground(.hidden)
-                .padding(24)
+            NativeTextViewWrapper(text: $model.text)
                 .onChange(of: model.text) { _, _ in model.textChanged() }
 
             HStack {
@@ -58,8 +54,6 @@ struct CaptureView: View {
             }
         }
         .frame(minWidth: 460, minHeight: 280)
-        .background(.regularMaterial)
         .onExitCommand { model.requestDismiss() }
-        .modifier(EditorCommands(model: model))
     }
 }

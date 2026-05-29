@@ -7,14 +7,8 @@ let package = Package(
     products: [
         .library(name: "CaptureKit", targets: ["CaptureKit"]),
     ],
-    dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-markdown.git", from: "0.8.0"),
-    ],
     targets: [
-        .target(
-            name: "CaptureKit",
-            dependencies: [.product(name: "Markdown", package: "swift-markdown")]
-        ),
+        .target(name: "CaptureKit"),
         .testTarget(
             name: "CaptureKitTests",
             dependencies: ["CaptureKit"],

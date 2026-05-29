@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		41A90F5CA740E516CC00B886 /* CaptureKit in Frameworks */ = {isa = PBXBuildFile; productRef = B5E55A5CCF0D519D7639A991 /* CaptureKit */; };
+		CB1E9785D67CD73248529357 /* MarkdownEngine in Frameworks */ = {isa = PBXBuildFile; productRef = BA6797303B5B1EEF0F840DF3 /* MarkdownEngine */; };
 		DFF1EEBD753AE3AB8D379FF4 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 6ED89F24179AF1C557344165 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
@@ -18,8 +19,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		644765A32FC8C5B70059BA77 /* fecni */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = fecni;
 			sourceTree = "<group>";
 		};
@@ -32,6 +31,7 @@
 			files = (
 				41A90F5CA740E516CC00B886 /* CaptureKit in Frameworks */,
 				DFF1EEBD753AE3AB8D379FF4 /* KeyboardShortcuts in Frameworks */,
+				CB1E9785D67CD73248529357 /* MarkdownEngine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,6 +76,7 @@
 			packageProductDependencies = (
 				B5E55A5CCF0D519D7639A991 /* CaptureKit */,
 				6ED89F24179AF1C557344165 /* KeyboardShortcuts */,
+				BA6797303B5B1EEF0F840DF3 /* MarkdownEngine */,
 			);
 			productName = fecni;
 			productReference = 644765A12FC8C5B70059BA77 /* fecni.app */;
@@ -106,8 +107,9 @@
 			mainGroup = 644765982FC8C5B70059BA77;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				C398A323F4F31201CB869680 /* XCLocalSwiftPackageReference "CaptureKit" */,
+				C398A323F4F31201CB869680 /* XCLocalSwiftPackageReference "Packages/CaptureKit" */,
 				E300BF331B145F348E5B0802 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				7D87C90A8278272F56B13819 /* XCRemoteSwiftPackageReference "swift-markdown-engine" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 644765A22FC8C5B70059BA77 /* Products */;
@@ -344,13 +346,21 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		C398A323F4F31201CB869680 /* XCLocalSwiftPackageReference "CaptureKit" */ = {
+		C398A323F4F31201CB869680 /* XCLocalSwiftPackageReference "Packages/CaptureKit" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/CaptureKit;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		7D87C90A8278272F56B13819 /* XCRemoteSwiftPackageReference "swift-markdown-engine" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nodes-app/swift-markdown-engine";
+			requirement = {
+				kind = exactVersion;
+				version = 0.5.0;
+			};
+		};
 		E300BF331B145F348E5B0802 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
@@ -370,6 +380,11 @@
 		B5E55A5CCF0D519D7639A991 /* CaptureKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CaptureKit;
+		};
+		BA6797303B5B1EEF0F840DF3 /* MarkdownEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7D87C90A8278272F56B13819 /* XCRemoteSwiftPackageReference "swift-markdown-engine" */;
+			productName = MarkdownEngine;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
