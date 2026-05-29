@@ -37,6 +37,23 @@ final class CapturePanelController: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
         panel.makeKeyAndOrderFront(nil)
         panel.orderFrontRegardless()
+
+        // Put the cursor in the editor so you can type immediately. The text view
+        // is created by NativeTextViewWrapper after the hosting view lays out, so
+        // defer to the next runloop tick.
+        DispatchQueue.main.async { [weak panel] in
+            guard let panel, let content = panel.contentView,
+                  let textView = Self.firstTextView(in: content) else { return }
+            panel.makeFirstResponder(textView)
+        }
+    }
+
+    private static func firstTextView(in view: NSView) -> NSTextView? {
+        if let textView = view as? NSTextView { return textView }
+        for subview in view.subviews {
+            if let found = firstTextView(in: subview) { return found }
+        }
+        return nil
     }
 
     /// Click-away: losing key focus saves & closes.

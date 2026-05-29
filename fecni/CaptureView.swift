@@ -30,9 +30,15 @@ final class CaptureModel {
 struct CaptureView: View {
     @Bindable var model: CaptureModel
 
+    private var editorConfiguration: MarkdownEditorConfiguration {
+        var config = MarkdownEditorConfiguration.default
+        config.textInsets = TextInsets(horizontal: 20, vertical: 20)
+        return config
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            NativeTextViewWrapper(text: $model.text)
+            NativeTextViewWrapper(text: $model.text, configuration: editorConfiguration)
                 .onChange(of: model.text) { _, _ in model.textChanged() }
 
             HStack {
