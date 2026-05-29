@@ -11,7 +11,11 @@ final class CapturePanel: NSPanel {
         )
         isFloatingPanel = true
         level = .floating
-        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .moveToActiveSpace]
+        // .canJoinAllSpaces and .moveToActiveSpace are mutually exclusive — AppKit
+        // throws if both are set. .canJoinAllSpaces shows the panel on whichever
+        // Space is active when summoned; .fullScreenAuxiliary floats it over
+        // full-screen apps.
+        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         titleVisibility = .hidden
         titlebarAppearsTransparent = true
         isMovableByWindowBackground = true
