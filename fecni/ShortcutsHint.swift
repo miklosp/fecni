@@ -1,5 +1,13 @@
 import SwiftUI
 
+/// The keyboard-shortcut hints shown in the editor, shared by the macOS 26+
+/// glass pill (`ShortcutsHint`) and the macOS 14–25 footer (`ShortcutsFooter`).
+let shortcutHintItems: [(keys: String, label: String)] = [
+    ("⌘1/2/3", "Heading"),
+    ("⌘B", "Bold"),
+    ("⌘I", "Italic"),
+]
+
 /// A Liquid Glass pill in the editor's bottom-right corner. Collapsed, it's a
 /// small glass circle showing the `keyboard` glyph. Expanding grows the glass
 /// capsule leftward, unmasking the keyboard-shortcut hints right-to-left — the
@@ -9,12 +17,8 @@ import SwiftUI
 /// part of the clipped, growing track, so it can never move with the reveal —
 /// it only morphs `keyboard` ⟷ ✕ in place via the native symbol-replace
 /// transition.
+@available(macOS 26, *)
 struct ShortcutsHint: View {
-    private let items: [(keys: String, label: String)] = [
-        ("⌘1/2/3", "Heading"),
-        ("⌘B", "Bold"),
-        ("⌘I", "Italic"),
-    ]
 
     private let buttonWidth: CGFloat = 26
     private let trailingPadding: CGFloat = 12
@@ -50,7 +54,7 @@ struct ShortcutsHint: View {
     /// never clipped away.
     private var glassTrack: some View {
         HStack(spacing: 16) {
-            ForEach(items, id: \.keys) { item in
+            ForEach(shortcutHintItems, id: \.keys) { item in
                 HStack(spacing: 6) {
                     Text(item.keys).font(.caption.monospaced())
                     Text(item.label).font(.caption).foregroundStyle(.secondary)
@@ -89,5 +93,24 @@ struct ShortcutsHint: View {
                 isExpanded.toggle()
             }
         }
+    }
+}
+
+/// The always-on shortcut hints shown below the editor on macOS 14–25, where
+/// Liquid Glass (and the expanding `ShortcutsHint` pill) is unavailable. A
+/// static, horizontally-centered row of the same chips — no glass, no
+/// expand/collapse, no geometry measurement.
+struct ShortcutsFooter: View {
+    var body: some View {
+        HStack(spacing: 16) {
+            ForEach(shortcutHintItems, id: \.keys) { item in
+                HStack(spacing: 6) {
+                    Text(item.keys).font(.caption.monospaced())
+                    Text(item.label).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity)
     }
 }
