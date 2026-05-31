@@ -8,6 +8,22 @@
 
 ---
 
+## Resolution — 2026-05-31
+
+All findings dispositioned; closed out. Fixes landed in the follow-up session (commit `a932b2d`) unless noted.
+
+- **F1, F2, F3** — fixed. `commit()`/`recoverDraftIfPresent()` route through `persist()`, which clears the draft only after a confirmed (non-nil) write; `finish()` is now idempotent (`guard panel != nil`).
+- **F7** — fixed. `willTerminateNotification` observer flushes the open draft (`saveNow`) on ⌘Q.
+- **F9, F10, F11, F12** — fixed. Settings vault/subfolder I/O cached in `@State` (single read); draft and note writes moved off the main actor (`DraftStore.io` serial queue; `persist()` `Task.detached`).
+- **F13** — fixed. Stub deleted.
+- **F14** — fixed. Deterministic `.path` tiebreaker; covered by the `equalTimestampsSortDeterministicallyByPath` test.
+- **F6** — resolved + **accepted**. The shortcuts surface now shows only the wired shortcuts (⌘1/2/3, ⌘B, ⌘I). Wiring the broader formatting set is a possible future extension; considered complete for now.
+- **F4** — **won't fix (by design)**. Committing & closing on *any* focus loss (⌘-Tab, opening Settings, click-away) is the intended capture-and-forget behavior — not just click-away. Do not "fix" or re-flag.
+- **F5** — **verified working**. Manual test confirms Esc closes the window and saves the note as expected; `NSTextView` does not swallow it.
+- **F8** — **accepted as-is**. A retry-once focus path was added and works in practice; switching to a MarkdownEngine focus API remains an optional future hardening.
+
+---
+
 ## Priority 1 — Data loss / duplication (fix first; all CONFIRMED)
 
 ### F1. `commit()` clears the draft even when the note wasn't persisted → typed note lost
