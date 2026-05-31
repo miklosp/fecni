@@ -12,6 +12,21 @@ final class CapturePanelController: NSObject, NSWindowDelegate {
     init(coordinator: AppCoordinator) {
         self.coordinator = coordinator
         super.init()
+        // Quitting (⌘Q) within the draft autosave debounce window would lose an
+        // in-progress note; flush it synchronously on terminate so the next
+        // launch recovers it.
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.flushOpenDraft() }
+        }
+    }
+
+    private func flushOpenDraft() {
+        guard let model else { return }
+        coordinator.draftStore.saveNow(model.text)
     }
 
     func present() {
@@ -41,10 +56,21 @@ final class CapturePanelController: NSObject, NSWindowDelegate {
         // Put the cursor in the editor so you can type immediately. The text view
         // is created by NativeTextViewWrapper after the hosting view lays out, so
         // defer to the next runloop tick.
-        DispatchQueue.main.async { [weak panel] in
-            guard let panel, let content = panel.contentView,
-                  let textView = Self.firstTextView(in: content) else { return }
-            panel.makeFirstResponder(textView)
+        focusEditor(in: panel, retriesRemaining: 1)
+    }
+
+    /// Focuses MarkdownEngine's text view once it exists in the panel's view
+    /// tree. On a cold launch the view may not be built within a single tick,
+    /// so retry once on the next pass before giving up.
+    private func focusEditor(in panel: CapturePanel, retriesRemaining: Int) {
+        DispatchQueue.main.async { [weak self, weak panel] in
+            guard let panel else { return }
+            if let content = panel.contentView,
+               let textView = Self.firstTextView(in: content) {
+                panel.makeFirstResponder(textView)
+            } else if retriesRemaining > 0 {
+                self?.focusEditor(in: panel, retriesRemaining: retriesRemaining - 1)
+            }
         }
     }
 
@@ -62,6 +88,8 @@ final class CapturePanelController: NSObject, NSWindowDelegate {
     }
 
     private func finish(markdown: String) {
+        // Esc and click-away can both land before teardown; commit at most once.
+        guard panel != nil else { return }
         coordinator.commit(markdown: markdown)
         panel?.delegate = nil
         panel?.close()

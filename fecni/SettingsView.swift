@@ -4,7 +4,8 @@ import CaptureKit
 
 struct SettingsView: View {
     @Bindable var coordinator: AppCoordinator
-    @State private var vaults: [ObsidianVault] = VaultLocator.detectedVaults()
+    @State private var vaults: [ObsidianVault] = []
+    @State private var subfolders: [String] = []
 
     var body: some View {
         Form {
@@ -20,7 +21,7 @@ struct SettingsView: View {
                 if let path = coordinator.settings.vaultPath {
                     Picker("Subfolder", selection: subfolderBinding) {
                         Text("(vault root)").tag("")
-                        ForEach(VaultLocator.subfolders(ofVault: path), id: \.self) { sub in
+                        ForEach(subfolders, id: \.self) { sub in
                             Text(sub).tag(sub)
                         }
                     }
@@ -34,7 +35,13 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .frame(width: 440)
-        .onAppear { vaults = VaultLocator.detectedVaults() }
+        .onAppear {
+            vaults = VaultLocator.detectedVaults()
+            subfolders = coordinator.settings.vaultPath.map(VaultLocator.subfolders(ofVault:)) ?? []
+        }
+        .onChange(of: coordinator.settings.vaultPath) { _, newPath in
+            subfolders = newPath.map(VaultLocator.subfolders(ofVault:)) ?? []
+        }
     }
 
     private var vaultBinding: Binding<String?> {

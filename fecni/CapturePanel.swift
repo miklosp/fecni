@@ -27,4 +27,23 @@ final class CapturePanel: NSPanel {
 
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
+
+    /// Intercept the formatting shortcuts before the editor's text view sees
+    /// them and translate each into a MarkdownEngine bus request. Handled here
+    /// (not via SwiftUI commands) because the editor is an AppKit text view in
+    /// an NSPanel. Only ⌘ alone — not ⇧/⌥/⌃ combos — is matched.
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        let flags = event.modifierFlags.intersection([.command, .shift, .control, .option])
+        guard flags == .command, let key = event.charactersIgnoringModifiers else {
+            return super.performKeyEquivalent(with: event)
+        }
+        let center = NotificationCenter.default
+        switch key {
+        case "b": center.post(name: .fecniApplyBold, object: nil)
+        case "i": center.post(name: .fecniApplyItalic, object: nil)
+        case "1", "2", "3": center.post(name: .fecniApplyHeading, object: nil, userInfo: ["level": Int(key)!])
+        default: return super.performKeyEquivalent(with: event)
+        }
+        return true
+    }
 }

@@ -17,6 +17,18 @@ private func fixtureData() throws -> Data {
     #expect(vaults[1].isOpen == false)
 }
 
+@Test func equalTimestampsSortDeterministicallyByPath() throws {
+    let json = #"""
+    {"vaults":{
+      "z":{"path":"/Users/me/Zeta","ts":1000,"open":false},
+      "a":{"path":"/Users/me/Alpha","ts":1000,"open":false}
+    }}
+    """#
+    let vaults = try VaultLocator.vaults(fromObsidianConfig: Data(json.utf8))
+    // Same ts → ordered by path, regardless of JSON-dictionary enumeration order.
+    #expect(vaults.map(\.path) == ["/Users/me/Alpha", "/Users/me/Zeta"])
+}
+
 @Test func emptyOrMissingVaultsKeyYieldsEmptyList() throws {
     #expect(try VaultLocator.vaults(fromObsidianConfig: Data("{}".utf8)).isEmpty)
     #expect(try VaultLocator.vaults(fromObsidianConfig: Data(#"{"vaults":{}}"#.utf8)).isEmpty)

@@ -6,6 +6,10 @@ import Foundation
 final class DraftStore {
     private let url: URL
     private var pending: DispatchWorkItem?
+    /// Serial queue for all draft disk I/O. Keeping writes and the clear/remove
+    /// on one FIFO queue preserves ordering, so a debounced write enqueued
+    /// before a `clear()` can't re-create the file afterwards.
+    private let io = DispatchQueue(label: "work.miklos.fecni.draft-io")
 
     init(fileName: String = "draft.md") {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -17,8 +21,11 @@ final class DraftStore {
     func scheduleSave(_ markdown: String) {
         pending?.cancel()
         let target = url
+        let io = self.io
+        // Debounce on the main actor (so cancel() stays serialized with the
+        // scheduling) but push the actual disk write to the background queue.
         let work = DispatchWorkItem {
-            try? markdown.write(to: target, atomically: true, encoding: .utf8)
+            io.async { try? markdown.write(to: target, atomically: true, encoding: .utf8) }
         }
         pending = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5, execute: work)
@@ -26,7 +33,10 @@ final class DraftStore {
 
     func saveNow(_ markdown: String) {
         pending?.cancel()
-        try? markdown.write(to: url, atomically: true, encoding: .utf8)
+        let target = url
+        // Synchronous so the note is on disk before the caller proceeds
+        // (used on app termination, where the process exits right after).
+        io.sync { try? markdown.write(to: target, atomically: true, encoding: .utf8) }
     }
 
     func load() -> String? {
@@ -37,6 +47,7 @@ final class DraftStore {
 
     func clear() {
         pending?.cancel()
-        try? FileManager.default.removeItem(at: url)
+        let target = url
+        io.async { try? FileManager.default.removeItem(at: target) }
     }
 }

@@ -24,7 +24,12 @@ public enum VaultLocator {
                     lastOpened: entry.ts.map { Date(timeIntervalSince1970: $0 / 1000) }
                 )
             }
-            .sorted { ($0.lastOpened ?? .distantPast) > ($1.lastOpened ?? .distantPast) }
+            .sorted { lhs, rhs in
+                let l = lhs.lastOpened ?? .distantPast
+                let r = rhs.lastOpened ?? .distantPast
+                // Tiebreak on path so equal timestamps don't reorder across launches.
+                return l == r ? lhs.path < rhs.path : l > r
+            }
     }
 
     /// Standard location of Obsidian's config on macOS.
