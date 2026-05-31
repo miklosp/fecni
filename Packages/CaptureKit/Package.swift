@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "CaptureKit",
-    platforms: [.macOS("26.0")],
+    platforms: [.macOS(.v14)],
     products: [
         .library(name: "CaptureKit", targets: ["CaptureKit"]),
     ],
