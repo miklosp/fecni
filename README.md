@@ -7,6 +7,11 @@ the moment you press Esc or click away.
 It's a native SwiftUI menu-bar app: no window to manage, no save button, nothing between the
 thought and the file.
 
+![The fecni capture panel floating above the macOS desktop, showing a note written in Markdown](fecni-preview.png)
+
+> **Heads up:** fecni is vibe-coded. It's also incredibly simple — a floating editor that writes
+> a Markdown file — so there's not much that can go wrong. PRs welcome.
+
 ## How it works
 
 1. Press the global shortcut (default **⌃⌥Space**). A floating panel appears, centered, above
