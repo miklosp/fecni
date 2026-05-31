@@ -88,7 +88,6 @@ Packages/CaptureKit/            Local SPM package: deterministic, unit-tested co
   CaptureSettings.swift         CaptureSettings model + SettingsStore (UserDefaults)
   ObsidianVault.swift           Vault value type
 
-docs/                           Design specs, implementation plans, and code-review notes
 scripts/                        Project scaffolding and build/log helpers
 ```
 
@@ -114,13 +113,6 @@ swift test --disable-sandbox --package-path Packages/CaptureKit
 
 The app itself you verify by running it. See [`CLAUDE.md`](CLAUDE.md) for why there's no
 app-hosted XCTest target on the current toolchain.
-
-## Design docs
-
-The original design and later feature specs live in `docs/superpowers/specs/`, implementation
-plans in `docs/superpowers/plans/`, and code-review notes in `docs/reviews/`. The editor
-approach changed after the original spec was written, so [`CLAUDE.md`](CLAUDE.md) has the
-current state.
 
 ## License
 

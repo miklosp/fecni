@@ -22,3 +22,6 @@ Packages/*/.build/
 # Claude Code (machine-local)
 CLAUDE.local.md
 .claude/
+
+# Design docs / internal notes (kept local, not published)
+docs/
