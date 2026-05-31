@@ -52,19 +52,35 @@ struct CaptureView: View {
         return config
     }
 
-    var body: some View {
+    private var editor: some View {
         NativeTextViewWrapper(text: $model.text, configuration: editorConfiguration)
             .onChange(of: model.text) { _, _ in model.textChanged() }
-            .overlay(alignment: .bottomTrailing) {
-                ShortcutsHint()
-                    .padding(12)
+    }
+
+    var body: some View {
+        Group {
+            if #available(macOS 26, *) {
+                // macOS 26+: the Liquid Glass pill floats in the corner.
+                editor.overlay(alignment: .bottomTrailing) {
+                    ShortcutsHint()
+                        .padding(12)
+                }
+            } else {
+                // macOS 14–25: a reserved footer strip below the editor so note
+                // text can never scroll behind the hints.
+                VStack(spacing: 0) {
+                    editor
+                    Divider()
+                    ShortcutsFooter()
+                }
             }
-            .frame(minWidth: 460, minHeight: 280)
-            // The panel's full-size-content titlebar is transparent and empty;
-            // without this SwiftUI insets content below the (invisible) titlebar,
-            // making the top gap larger than the sides. Extend into it so the
-            // editor's own 20pt text inset is the only top padding.
-            .ignoresSafeArea(.container, edges: .top)
-            .onExitCommand { model.requestDismiss() }
+        }
+        .frame(minWidth: 460, minHeight: 280)
+        // The panel's full-size-content titlebar is transparent and empty;
+        // without this SwiftUI insets content below the (invisible) titlebar,
+        // making the top gap larger than the sides. Extend into it so the
+        // editor's own 20pt text inset is the only top padding.
+        .ignoresSafeArea(.container, edges: .top)
+        .onExitCommand { model.requestDismiss() }
     }
 }
