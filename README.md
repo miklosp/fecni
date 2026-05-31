@@ -9,8 +9,8 @@ thought and the file.
 
 ![The fecni capture panel floating above the macOS desktop, showing a note written in Markdown](fecni-preview.png)
 
-> **Heads up:** fecni is vibe-coded. It's also incredibly simple — a floating editor that writes
-> a Markdown file — so there's not much that can go wrong. PRs welcome.
+> **Heads up:** fecni is vibe-coded. It's also incredibly simple: it floats an editor up and
+> writes a Markdown file, so there's not much that can go wrong. PRs welcome.
 
 ## How it works
 
@@ -41,8 +41,8 @@ refuse to open it. To allow it once:
 - Or, from Terminal: `xattr -dr com.apple.quarantine /Applications/fecni.app`
 
 After that it launches normally. On macOS 15+ the old right-click → Open shortcut no longer
-bypasses Gatekeeper for unnotarized apps — use the Settings route above. (If you'd rather not
-trust a prebuilt binary, build it yourself — see below.)
+bypasses Gatekeeper for unnotarized apps, so use the Settings route above. (If you'd rather not
+trust a prebuilt binary, you can build it yourself; see below.)
 
 ## Requirements
 
@@ -71,7 +71,7 @@ open <BUILT_PRODUCTS_DIR>/fecni.app
 ## Project structure
 
 ```
-fecni/                          App target — SwiftUI UI + AppKit glue
+fecni/                          App target: SwiftUI UI + AppKit glue
   fecniApp.swift                @main entry; MenuBarExtra + Settings scenes
   AppCoordinator.swift          Composition root: settings, draft store, hotkey, commit/persist
   CapturePanel.swift            Floating NSPanel (joins all Spaces, floats over full-screen)
@@ -82,7 +82,7 @@ fecni/                          App target — SwiftUI UI + AppKit glue
   ShortcutsHint.swift           Liquid Glass pill (macOS 26+) and static footer (14–25)
   Hotkey.swift                  Global shortcut definition (default ⌃⌥Space)
 
-Packages/CaptureKit/            Local SPM package — deterministic, unit-tested core (no deps)
+Packages/CaptureKit/            Local SPM package: deterministic, unit-tested core (no deps)
   VaultLocator.swift            Parse Obsidian's obsidian.json; list vaults & subfolders
   CaptureStore.swift            Collision-safe filename + atomic file write
   CaptureSettings.swift         CaptureSettings model + SettingsStore (UserDefaults)
@@ -99,10 +99,10 @@ be checked by running the app.
 
 ## Dependencies
 
-- [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) — global hotkey
+- [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) handles global hotkey
   registration and the rebind recorder UI (no Accessibility permission required).
 - [swift-markdown-engine](https://github.com/nodes-app/swift-markdown-engine) (`MarkdownEngine`)
-  — the native TextKit 2 Markdown editor that is the capture surface. Currently pinned to a
+  is the native TextKit 2 Markdown editor used as the capture surface. Currently pinned to a
   personal fork ([miklosp/swift-markdown-engine](https://github.com/miklosp/swift-markdown-engine))
   carrying a heading-newline fix; this will revert to upstream once the fix is released there.
 
