@@ -102,9 +102,7 @@ be checked by running the app.
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) handles global hotkey
   registration and the rebind recorder UI (no Accessibility permission required).
 - [swift-markdown-engine](https://github.com/nodes-app/swift-markdown-engine) (`MarkdownEngine`)
-  is the native TextKit 2 Markdown editor used as the capture surface. Currently pinned to a
-  personal fork ([miklosp/swift-markdown-engine](https://github.com/miklosp/swift-markdown-engine))
-  carrying a heading-newline fix; this will revert to upstream once the fix is released there.
+  is the native TextKit 2 Markdown editor used as the capture surface, pinned to 0.5.1.
 
 ## Tests
 
