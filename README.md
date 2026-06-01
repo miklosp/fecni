@@ -15,7 +15,7 @@ thought and the file.
 ## Why fecni?
 
 I wanted a fast, lightweight way to jot a note straight into my Obsidian vault, and I couldn't
-find one I liked. Fecni is the small thing I actually wanted: a shortcut, a field to type into,
+find one I liked. fecni is the small thing I actually wanted: a shortcut, a field to type into,
 and a plain Markdown file in your vault. Nothing else.
 
 If you want something more, try [Stik](https://github.com/0xMassi/stik_app).
