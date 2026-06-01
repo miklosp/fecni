@@ -12,6 +12,14 @@ thought and the file.
 > **Heads up:** fecni is vibe-coded. It's also incredibly simple: it floats an editor up and
 > writes a Markdown file, so there's not much that can go wrong. PRs welcome.
 
+## Why fecni?
+
+I wanted a fast, lightweight way to jot a note straight into my Obsidian vault, and I couldn't
+find one I liked. The quick-capture apps I tried were either too heavy, kept notes in their own
+database, or synced through some service instead of just writing a Markdown file where Obsidian
+could see it. fecni is the small thing I actually wanted: a shortcut, a floating editor, and a
+plain Markdown file in your vault. Nothing else.
+
 ## How it works
 
 1. Press the global shortcut (default **⌃⌥Space**). A floating panel appears, centered, above

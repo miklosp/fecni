@@ -6,11 +6,8 @@ bundle id `work.miklos.fecni`, non-sandboxed Developer ID. Liquid Glass UI is ga
 macOS 26+ with a graceful fallback. Human-facing overview: `README.md`.
 
 > **Editor:** the capture surface is **MarkdownEngine** (native TextKit 2), not SwiftUI
-> `TextEditor`. The in-progress note is a plain Markdown `String`, so saving just writes it
-> — no AttributedString↔Markdown conversion. The original spec
-> (`docs/superpowers/specs/2026-05-28-fecni-design.md`) predates this switch (TextEditor
-> couldn't render block constructs live); its editor section is historical, but the
-> storage/vault/settings design still holds.
+> `TextEditor` (which couldn't render block constructs live). The in-progress note is a plain
+> Markdown `String`, so saving just writes it — no AttributedString↔Markdown conversion.
 
 ## Architecture
 
