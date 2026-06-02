@@ -42,16 +42,9 @@ Grab the latest build for your Mac from the [Releases page](https://github.com/m
 **`fecni-arm64.zip`** for Apple Silicon (M1 and later) or **`fecni-x86_64.zip`** for Intel. Unzip it,
 and drag **fecni.app** into your Applications folder. Requires macOS 14 or later.
 
-The app is **signed only ad-hoc, not notarized**, so on first launch macOS Gatekeeper will
-refuse to open it. To allow it once:
-
-- Double-click it, dismiss the warning, then open **System Settings → Privacy & Security**,
-  scroll to the message about *fecni*, and click **Open Anyway** (confirm on the next prompt).
-- Or, from Terminal: `xattr -dr com.apple.quarantine /Applications/fecni.app`
-
-After that it launches normally. On macOS 15+ the old right-click → Open shortcut no longer
-bypasses Gatekeeper for unnotarized apps, so use the Settings route above. (If you'd rather not
-trust a prebuilt binary, you can build it yourself; see below.)
+The app is signed with a Developer ID certificate and notarized by Apple, so it opens normally
+on first launch, no Gatekeeper workaround needed. (If you'd rather not trust a prebuilt binary,
+you can build it yourself; see below.)
 
 ## Requirements
 
