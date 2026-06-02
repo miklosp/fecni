@@ -4,8 +4,8 @@ import Foundation
 
 @Test func defaultsAreEmpty() {
     let s = CaptureSettings()
-    #expect(s.vaultPath == nil)
-    #expect(s.subfolder == "")
+    #expect(s.folderPath == nil)
+    #expect(s.resolvedDirectory == nil)
 }
 
 @Test func storeRoundTripsThroughUserDefaults() {
@@ -13,17 +13,14 @@ import Foundation
     let store = SettingsStore(defaults: defaults)
     #expect(store.load() == CaptureSettings())
 
-    let updated = CaptureSettings(vaultPath: "/Users/me/Vault", subfolder: "00-Inbox")
+    let updated = CaptureSettings(folderPath: "/Users/me/Notes")
     store.save(updated)
     #expect(store.load() == updated)
 }
 
-@Test func resolvedDirectoryJoinsVaultAndSubfolder() {
-    let s = CaptureSettings(vaultPath: "/Users/me/Vault", subfolder: "00-Inbox")
+@Test func resolvedDirectoryIsTheChosenFolder() {
+    let s = CaptureSettings(folderPath: "/Users/me/Vault/00-Inbox")
     #expect(s.resolvedDirectory?.path == "/Users/me/Vault/00-Inbox")
 
-    let root = CaptureSettings(vaultPath: "/Users/me/Vault", subfolder: "")
-    #expect(root.resolvedDirectory?.path == "/Users/me/Vault")
-
-    #expect(CaptureSettings(vaultPath: nil).resolvedDirectory == nil)
+    #expect(CaptureSettings(folderPath: nil).resolvedDirectory == nil)
 }

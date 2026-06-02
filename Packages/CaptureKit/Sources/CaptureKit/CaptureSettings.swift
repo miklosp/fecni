@@ -1,19 +1,15 @@
 import Foundation
 
 public struct CaptureSettings: Equatable, Codable, Sendable {
-    public var vaultPath: String?
-    public var subfolder: String
+    public var folderPath: String?
 
-    public init(vaultPath: String? = nil, subfolder: String = "") {
-        self.vaultPath = vaultPath
-        self.subfolder = subfolder
+    public init(folderPath: String? = nil) {
+        self.folderPath = folderPath
     }
 
-    /// Vault root joined with the (possibly empty) subfolder, or nil if no vault chosen.
+    /// The folder notes are saved into, or nil if none has been chosen.
     public var resolvedDirectory: URL? {
-        guard let vaultPath else { return nil }
-        let base = URL(fileURLWithPath: vaultPath, isDirectory: true)
-        return subfolder.isEmpty ? base : base.appendingPathComponent(subfolder, isDirectory: true)
+        folderPath.map { URL(fileURLWithPath: $0, isDirectory: true) }
     }
 }
 

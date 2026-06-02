@@ -28,13 +28,13 @@ If you want something more, try [Collector](https://github.com/juliandeans/Colle
    links are styled as you write, with the markup still visible. ⌘B / ⌘I / ⌘1–3 apply bold,
    italic, and headings.
 3. Press **Esc** or click away. The note saves automatically as a `yyyy-MM-dd HHmm.md` file in
-   your configured vault folder, and the panel disappears.
+   your configured folder, and the panel disappears.
 
 If you typed nothing, nothing is saved. If the app quits or crashes mid-note, the in-progress
 text is autosaved to a draft and recovered on the next launch.
 
-**Settings**, from the menu-bar icon, is where you pick the vault and subfolder and rebind the
-shortcut. fecni reads Obsidian's own config to list your vaults, or you can point it at any folder.
+**Settings**, from the menu-bar icon, is where you pick the folder your notes save into and rebind
+the shortcut. Point it at any folder, whether it's inside an Obsidian vault or not.
 
 ## Download
 
@@ -86,16 +86,14 @@ fecni/                          App target: SwiftUI UI + AppKit glue
   CapturePanel.swift            Floating NSPanel (joins all Spaces, floats over full-screen)
   CapturePanelController.swift  Presents the panel; commits the note on Esc / click-away
   CaptureView.swift             CaptureModel + hosts MarkdownEngine's editor
-  SettingsView.swift            Vault / subfolder pickers and the shortcut recorder
+  SettingsView.swift            Folder picker, login-item toggle, and the shortcut recorder
   DraftStore.swift              Debounced crash-recovery autosave
   ShortcutsHint.swift           Liquid Glass pill (macOS 26+) and static footer (14–25)
   Hotkey.swift                  Global shortcut definition (default ⌃⌥Space)
 
 Packages/CaptureKit/            Local SPM package: deterministic, unit-tested core (no deps)
-  VaultLocator.swift            Parse Obsidian's obsidian.json; list vaults & subfolders
   CaptureStore.swift            Collision-safe filename + atomic file write
   CaptureSettings.swift         CaptureSettings model + SettingsStore (UserDefaults)
-  ObsidianVault.swift           Vault value type
 
 scripts/                        Project scaffolding and build/log helpers
 ```
