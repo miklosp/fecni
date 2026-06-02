@@ -38,8 +38,9 @@ shortcut. fecni reads Obsidian's own config to list your vaults, or you can poin
 
 ## Download
 
-Grab the latest `fecni.zip` from the [Releases page](https://github.com/miklosp/fecni/releases),
-unzip it, and drag **fecni.app** into your Applications folder. Requires macOS 14 or later.
+Grab the latest build for your Mac from the [Releases page](https://github.com/miklosp/fecni/releases):
+**`fecni-arm64.zip`** for Apple Silicon (M1 and later) or **`fecni-x86_64.zip`** for Intel. Unzip it,
+and drag **fecni.app** into your Applications folder. Requires macOS 14 or later.
 
 The app is **signed only ad-hoc, not notarized**, so on first launch macOS Gatekeeper will
 refuse to open it. To allow it once:
