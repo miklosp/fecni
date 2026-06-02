@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  # Build one ad-hoc-signed .app per architecture and upload each as an
+  # artifact. Apple Silicon and Intel ship as separate downloads (not a single
+  # universal binary), so users grab the slice that matches their Mac.
+  build:
+    runs-on: macos-15
+    strategy:
+      matrix:
+        arch: [arm64, x86_64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26'
+
+      - name: Build Release (${{ matrix.arch }}, ad-hoc)
+        run: |
+          V="${GITHUB_REF_NAME#v}"   # v1.0.1 -> 1.0.1
+          xcodebuild build \
+            -project fecni.xcodeproj -scheme fecni \
+            -configuration Release -destination 'generic/platform=macOS' \
+            -derivedDataPath build \
+            ARCHS="${{ matrix.arch }}" ONLY_ACTIVE_ARCH=NO \
+            MARKETING_VERSION="${V}" CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
+            CODE_SIGN_IDENTITY="-" CODE_SIGNING_REQUIRED=NO
+
+      - name: Package
+        run: |
+          ditto -c -k --keepParent \
+            build/Build/Products/Release/fecni.app "fecni-${{ matrix.arch }}.zip"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fecni-${{ matrix.arch }}
+          path: fecni-${{ matrix.arch }}.zip
+
+  # Collect both slices and publish a single GitHub release for the tag with
+  # both zips attached. Splitting build/publish avoids two matrix legs racing
+  # to create the same release.
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Collect artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
