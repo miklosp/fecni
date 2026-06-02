@@ -6,9 +6,15 @@ struct SettingsView: View {
     @Bindable var coordinator: AppCoordinator
     @State private var vaults: [ObsidianVault] = []
     @State private var subfolders: [String] = []
+    @State private var showLoginItemError = false
+    @State private var loginItemErrorMessage = ""
 
     var body: some View {
         Form {
+            Section("General") {
+                Toggle("Open fecni at login", isOn: launchAtLoginBinding)
+            }
+
             Section("Vault") {
                 Picker("Vault", selection: vaultBinding) {
                     Text("Choose…").tag(String?.none)
@@ -42,6 +48,28 @@ struct SettingsView: View {
         .onChange(of: coordinator.settings.vaultPath) { _, newPath in
             subfolders = newPath.map(VaultLocator.subfolders(ofVault:)) ?? []
         }
+        .alert("Couldn’t update login item", isPresented: $showLoginItemError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(loginItemErrorMessage)
+        }
+    }
+
+    /// Mirrors the live `SMAppService` status. A failed register/unregister
+    /// leaves the OS state unchanged and surfaces an alert; reading the status
+    /// back on the next render snaps the toggle to where it actually is.
+    private var launchAtLoginBinding: Binding<Bool> {
+        Binding(
+            get: { LoginItem.isEnabled },
+            set: { enabled in
+                do {
+                    try LoginItem.setEnabled(enabled)
+                } catch {
+                    loginItemErrorMessage = error.localizedDescription
+                    showLoginItemError = true
+                }
+            }
+        )
     }
 
     private var vaultBinding: Binding<String?> {
